@@ -15,6 +15,12 @@ func (a ByHost) Len() int           { return len(a) }
 func (a ByHost) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a ByHost) Less(i, j int) bool { return a[i].Name < a[j].Name }
 
+type ByName []v1.Namespace
+
+func (a ByName) Len() int           { return len(a) }
+func (a ByName) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a ByName) Less(i, j int) bool { return a[i].Name < a[j].Name }
+
 // NamespacesOutput ...
 type NamespacesOutput struct {
 	Items []v1.Namespace `json:"items"`
@@ -30,6 +36,7 @@ func (k8s *Kubernetes) GetNamespaces() (NamespacesOutput, error) {
 	}
 
 	output.Items = namespaces.Items
+	sort.Sort(ByName(output.Items))
 	return output, nil
 }
 
