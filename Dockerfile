@@ -9,12 +9,12 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o k8s-ingress-linklist src/cmd/kubernetes
 
 
 FROM alpine:edge
-
-RUN apk --no-cache add ca-certificates tzdata
-
+WORKDIR /app
 COPY --from=build /app/k8s-ingress-linklist .
 COPY src/internal/frontend /app/internal/frontend
 COPY src/web /app/web
+
+RUN apk --no-cache add ca-certificates tzdata
 
 EXPOSE 8080
 
