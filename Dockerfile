@@ -1,16 +1,21 @@
-FROM alpine
-MAINTAINER Julian Kleinhans <julian.kleinhans@aoe.com>
-
-RUN apk --no-cache add ca-certificates && update-ca-certificates
-RUN mkdir -p /usr/bin
-ADD k8s-ingress-linklist /usr/bin/
-RUN chmod +x /usr/bin/k8s-ingress-linklist
-ENV PATH $PATH:/usr/bin
-
+FROM golang:alpine AS build
 WORKDIR /app
+
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY . .
+RUN CGO_ENABLED=0 GOOS=linux go build -o k8s-ingress-linklist .
+
+
+FROM alpine:edge
+
+RUN apk --no-cache add ca-certificates tzdata
+
+COPY --from=build /app/k8s-ingress-linklist .
 COPY src/internal/frontend /app/internal/frontend
 COPY src/web /app/web
 
 EXPOSE 8080
 
-CMD ["/usr/bin/k8s-ingress-linklist"]
+CMD ["/app/k8s-ingress-linklist"]
