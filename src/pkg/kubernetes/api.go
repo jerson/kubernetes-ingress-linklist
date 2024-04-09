@@ -2,11 +2,18 @@ package kubernetes
 
 import (
 	"context"
+	"sort"
 
 	v1 "k8s.io/api/core/v1"
 	networkingv1 "k8s.io/api/networking/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
+
+type ByHost []networkingv1.Ingress
+
+func (a ByHost) Len() int           { return len(a) }
+func (a ByHost) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a ByHost) Less(i, j int) bool { return a[i].Spec.Rules[0].Host < a[j].Spec.Rules[0].Host }
 
 // NamespacesOutput ...
 type NamespacesOutput struct {
@@ -42,5 +49,6 @@ func (k8s *Kubernetes) GetIngresses() (IngressesOutput, error) {
 	}
 
 	output.Items = ingresses.Items
+	sort.Sort(ByHost(output.Items))
 	return output, nil
 }
