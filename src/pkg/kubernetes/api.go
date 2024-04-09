@@ -1,22 +1,23 @@
 package kubernetes
 
 import (
-	api_v1 "k8s.io/api/core/v1"
-	v1_beta1 "k8s.io/api/extensions/v1beta1"
-	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc" // xxx
+	"context"
+
+	v1 "k8s.io/api/core/v1"
+	networkingv1 "k8s.io/api/networking/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // NamespacesOutput ...
 type NamespacesOutput struct {
-	Items []api_v1.Namespace `json:"items"`
+	Items []v1.Namespace `json:"items"`
 }
 
 // GetNamespaces ...
 func (k8s *Kubernetes) GetNamespaces() (NamespacesOutput, error) {
 	k8s.init()
 	output := NamespacesOutput{}
-	namespaces, err := k8s.clientset.CoreV1().Namespaces().List(meta_v1.ListOptions{})
+	namespaces, err := k8s.clientset.CoreV1().Namespaces().List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		return output, err
 	}
@@ -27,7 +28,7 @@ func (k8s *Kubernetes) GetNamespaces() (NamespacesOutput, error) {
 
 // IngressesOutput ...
 type IngressesOutput struct {
-	Items []v1_beta1.Ingress `json:"items"`
+	Items []networkingv1.Ingress `json:"items"`
 }
 
 // GetIngresses ...
@@ -35,7 +36,7 @@ func (k8s *Kubernetes) GetIngresses() (IngressesOutput, error) {
 	k8s.init()
 	output := IngressesOutput{}
 
-	ingresses, err := k8s.clientset.ExtensionsV1beta1().Ingresses(k8s.Namespace).List(meta_v1.ListOptions{})
+	ingresses, err := k8s.clientset.NetworkingV1().Ingresses(k8s.Namespace).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		return output, err
 	}
