@@ -13,7 +13,7 @@ type ByHost []networkingv1.Ingress
 
 func (a ByHost) Len() int           { return len(a) }
 func (a ByHost) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a ByHost) Less(i, j int) bool { return a[i].Spec.Rules[0].Host < a[j].Spec.Rules[0].Host }
+func (a ByHost) Less(i, j int) bool { return a[i].Name < a[j].Name }
 
 // NamespacesOutput ...
 type NamespacesOutput struct {
